@@ -1,0 +1,300 @@
+---
+output:html_document
+---
+TITLE by VISHNU DEVARAKONDA
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using
+# in your analysis in this code chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk.
+# This prevents the code from displaying in the knitted HTML output.
+# You should set echo=FALSE for all code chunks in your file.
+#Sys.setenv(RSTUDIO_PANDOC="C:/Program Files/RStudio/bin/pandoc")
+#setwd("F:/My-classes/tidy datasets")
+library(ggplot2)
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+nhdsdata<-read.csv("D:/udacity/project4/nhdsTidyData.csv",check.names = TRUE, fileEncoding = "UTF-8")
+
+nhdsdatadf<-data.frame(nhdsdata)
+
+summary(nhdsdatadf)
+
+```
+We could see that there were more females than males and also there were more number of Emergency Admissions.
+
+# Univariate Plots Section
+```{r echo=FALSE, Univariate_Plots}
+library("ggplot2")
+par("mar")
+par(mar=c(1,1,1,1))
+library("ggplot2")
+by(nhdsMaster$DaysofCare,nhdsMaster$Sex,summary)
+#histogram for yearly discharge
+ggplot(aes(x=Year), data = nhdsdatadf)+geom_histogram()+scale_x_continuous(breaks = (1998:2010))
+#histogram for Days of Care
+ggplot(aes(x=DaysofCare), data = nhdsdatadf)+geom_histogram()+scale_x_continuous(limits=c(0,30),breaks=seq(0,30,1))
+```
+  Most of the discharges are less than 3 days.
+```{r echo=FALSE}
+#histogram for Age
+ggplot(data = nhdsdatadf, aes(x=Age))+geom_histogram(binwidth = 3)
+```
+  Most of the patients are either infants, less than year old or senior citizens. Also we could see the  graph is of bimodal distribution.
+```{r echo=FALSE}
+#histogram for DischargeStatus
+ggplot(data = nhdsdatadf, aes(x=DischargeStatus))+geom_histogram()+theme(axis.text.x=element_text(angle = 45, vjust = 0.5))
+```
+  We could see that most number of patients come to hospital for routine check-up.
+```{r echo=FALSE}
+#histogram for NewBorn
+ggplot(data = nhdsdatadf, aes(x=NewBorn))+geom_histogram(binwidth = 0.5)
+```
+  This is something interesting here. We could see that age of patients are less than one year but here we could see that there were more Non-New borns that New borns.
+```{r echo=FALSE}
+#histogram for Race
+ggplot(data = nhdsdatadf, aes(x=Race))+geom_histogram()+theme(axis.text.x=element_text(angle = 60, vjust = 0.5))
+#histogram for geolocation
+ggplot(data = nhdsdatadf, aes(x=X.GeoLocation))+geom_histogram() 
+```
+  We could see that patients are more in number from Souther Region followed by Mid-West and North-East regions of United States.
+```{r echo=FALSE}
+#histogram for MaritalStatus
+ggplot(data = nhdsdatadf, aes(x=MaritalStatus))+geom_histogram(binwidth = 0.5)
+nhdsdatadf$X.secondpayment<-factor(nhdsdatadf$X.secondpayment, levels = c(1,2,3,4,5,6,7,8,9,10,99), labels = c("Worker Compensation","Medicare","Medicaid","Government","Blue Cross","HMO/PPO","Private Insurance","Self-Pay","No Charge","Others","NA"))
+
+nhdsdatadf$ModeofPayment<-factor(nhdsdatadf$ModeofPayment, levels = c(1,2,3,4,5,6,7,8,9,10,99), labels = c("Worker Compensation","Medicare","Medicaid","Government","Blue Cross","HMO/PPO","Private Insurance","Self-Pay","No Charge","Others","NA"))
+#histogram for ModeofPayment
+ggplot(data = nhdsdatadf, aes(x=ModeofPayment))+geom_histogram(binwidth = 0.5)
+#histogram for X.secondpayment
+ggplot(data = nhdsdatadf, aes(x=X.secondpayment))+geom_histogram(binwidth = 0.5)
+#histogram for Hospitaltype
+ggplot(data = nhdsdatadf, aes(x=HospitalType))+geom_histogram(binwidth = 0.5) 
+```
+  More number of discharges are from Charity hospitals.
+```{r echo=FALSE}
+#histogram for sEX
+ggplot(data = nhdsdatadf, aes(x=Sex))+geom_histogram(binwidth = 0.5)
+#histogram for Source of Admission
+ggplot(data = nhdsdatadf, aes(x=SourceofAdmission))+geom_histogram(binwidth = 0.5)+theme(axis.text.x=element_text(angle = 45, vjust = 0.5)) 
+```
+There are more number of Emergency Admissions followed by Physician referrals.
+```{r echo=FALSE}
+#histogram for Admission type
+ggplot(data = nhdsdatadf, aes(x=Admissiontype))+geom_histogram(binwidth = 0.5)+theme(axis.text.x=element_text(angle = 45, vjust = 0.5))
+#histogram for diagcode1
+tab<-table(nhdsdatadf$Diagnosis.Code.1)
+tab_s<-sort(tab)
+top_10<-tail(names(tab_s), 10)
+diag1<-subset(nhdsdatadf, Diagnosis.Code.1 %in% top_10)
+nhdsdatadf$Diagnosis.Code.1 <- factor(nhdsdatadf$Diagnosis.Code.1, levels = rev(top_10))
+ggplot(data = nhdsdatadf, aes(x=Diagnosis.Code.1))+geom_histogram()+theme(axis.text.x=element_text(angle = 45, vjust = 0.5)) 
+```
+  There are more number of Delivery cases but we could see that patients who got discharged are not new borns. This is interesting to explore.
+```{r echo=FALSE}
+#histogram for diagcode2
+tab<-table(nhdsdatadf$Diagnosis.Code.2)
+tab_s<-sort(tab) 
+top_10<-tail(names(tab_s), 10)
+diag1<-subset(nhdsdatadf, Diagnosis.Code.2 %in% top_10)
+nhdsdatadf$Diagnosis.Code.2 <- factor(nhdsdatadf$Diagnosis.Code.2, levels = rev(top_10))
+ggplot(data = nhdsdatadf, aes(x=Diagnosis.Code.2))+geom_histogram()+theme(axis.text.x=element_text(angle = 45, vjust = 0.5))
+#histogram for diagcode3
+tab<-table(nhdsdatadf$Diagnosis.Code.3)
+tab_s<-sort(tab)
+top_10<-tail(names(tab_s), 10)
+diag1<-subset(nhdsdatadf, Diagnosis.Code.3 %in% top_10)
+nhdsdatadf$Diagnosis.Code.3 <- factor(nhdsdatadf$Diagnosis.Code.3, levels = rev(top_10))
+ggplot(data = nhdsdatadf, aes(x=Diagnosis.Code.3))+geom_histogram()+theme(axis.text.x=element_text(angle = 45, vjust = 0.5))
+#histogram for diagcode4
+tab<-table(nhdsdatadf$Diagnosis.Code.4)
+tab_s<-sort(tab)
+top_10<-tail(names(tab_s), 10)
+diag1<-subset(nhdsdatadf, Diagnosis.Code.4 %in% top_10)
+nhdsdatadf$Diagnosis.Code.4 <- factor(nhdsdatadf$Diagnosis.Code.4, levels = rev(top_10))
+ggplot(data = nhdsdatadf, aes(x=Diagnosis.Code.4))+geom_histogram()+theme(axis.text.x=element_text(angle = 45, vjust = 0.5))
+#histogram for diagcode5
+tab<-table(nhdsdatadf$Diagnosis.Code.5)
+tab_s<-sort(tab)
+top_10<-tail(names(tab_s), 10)
+diag1<-subset(nhdsdatadf, Diagnosis.Code.5 %in% top_10)
+nhdsdatadf$Diagnosis.Code.5 <- factor(nhdsdatadf$Diagnosis.Code.5, levels = rev(top_10))
+ggplot(data = nhdsdatadf, aes(x=Diagnosis.Code.5))+geom_histogram()+theme(axis.text.x=element_text(angle = 45, vjust = 0.5))
+#histogram for diagcode6
+tab<-table(nhdsdatadf$Diagnosis.Code.6)
+tab_s<-sort(tab)
+top_10<-tail(names(tab_s), 10)
+diag1<-subset(nhdsdatadf, Diagnosis.Code.6 %in% top_10)
+nhdsdatadf$Diagnosis.Code.6 <- factor(nhdsdatadf$Diagnosis.Code.6, levels = rev(top_10))
+ggplot(data = nhdsdatadf, aes(x=Diagnosis.Code.6))+geom_histogram()+theme(axis.text.x=element_text(angle = 45, vjust = 0.6))
+#histogram for diagcode7
+tab<-table(nhdsdatadf$Diagnosis.Code.7)
+tab_s<-sort(tab)
+top_10<-tail(names(tab_s), 10)
+diag1<-subset(nhdsdatadf, Diagnosis.Code.7 %in% top_10)
+nhdsdatadf$Diagnosis.Code.7 <- factor(nhdsdatadf$Diagnosis.Code.7, levels = rev(top_10))
+ggplot(data = nhdsdatadf, aes(x=Diagnosis.Code.7))+geom_histogram(binwidth=0.1)+theme(axis.text.x=element_text(angle = 45, vjust = 0.7))
+
+
+```
+
+
+
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+
+There are 1646165 observations in the dataset with 36 features and I have selected omitted 10 features for this analysis. This dataset is mainly about the discharge status of US patients for a period 2001-2005. Their diagnosis, race, payment method etc are some features of interest.
+
+Other Observations:
+
+* New borns are less
+* People tend to go to Charity hospitals more
+* Whites are more prone to diseases as compared to other Race.
+* Apart from NA, Single patients are highest and seperated are lowest.
+* Mean of DaysofCare
+```{r echo=FALSE}
+with(nhdsdatadf, mean(nhdsdatadf$DaysofCare))
+```
+* Mean of Age
+```{r echo=FALSE}
+with(nhdsdatadf, mean(nhdsdatadf$Age))
+```
+* Median of DaysofCare
+```{r echo=FALSE}
+with(nhdsdatadf, median(nhdsdatadf$DaysofCare))
+```
+* Median of Age
+```{r echo=FALSE}
+with(nhdsdatadf, median(nhdsdatadf$Age))
+```
+* Standard Deviation of DaysofCare
+```{r echo=FALSE}
+with(nhdsdatadf, sd(nhdsdatadf$DaysofCare))
+```
+* Standard Deviation of Age
+```{r echo=FALSE}
+with(nhdsdatadf, sd(nhdsdatadf$Age))
+
+
+```
+
+### What is/are the main feature(s) of interest in your dataset?
+
+  The main features in the dataset are Sex, Age, Discharge Status, Diagnosis Code, Source of Admission and Mode of payment. 
+
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+
+  Weight, Race and Geolocation are likely to contribute to the discharge status of the patients. 
+
+### Did you create any new variables from existing variables in the dataset?
+  No.I have not created any new variable.
+
+### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+  We could see Age feature is bimodal distrbution. I have done lot of cleaning the data such as removing spaces and blanks, replacing diagnosis codes based on ICD codes, factoring almost all features.
+
+# Bivariate Plots Section
+```{r echo=FALSE, Bivariate_Plots}
+qplot(x=Sex,y=DaysofCare,geom = 'boxplot', data = nhdsdatadf,ylim = c(0,10))
+
+qplot(x=DaysofCare, y=..count../sum(..count..),data = nhdsdatadf,geom = 'freqpoly', color = Sex, ylab = 'Proportion')+scale_x_continuous(lim=c(0,1000),breaks=seq(0,1000,100))
+```
+  Though females are on higher side of count, males stayed longer than females
+
+```{r echo=FALSE}
+qplot(x=Sex,y=Age,data = nhdsdatadf, geom = 'boxplot')+scale_y_continuous(lim=c(0,99),breaks=seq(0,99,5))
+
+spineplot(nhdsdatadf$Age, nhdsdatadf$Sex)
+
+qplot(x=DaysofCare,y=Age,data = nhdsdatadf)+scale_y_continuous(lim=c(0,99),breaks=seq(0,99,5))+scale_x_continuous(lim=c(0,300),breaks=seq(0,300,25))
+
+qplot(x=Year,y=DaysofCare,data = nhdsdatadf)+scale_y_continuous(lim=c(0,300),breaks=seq(0,300,20))
+
+mosaicplot(~nhdsdatadf$DischargeStatus + nhdsdatadf$Sex, xlab = 'DischargeStatus', ylab = 'Sex', las = 2, cex.axis = 0.8)
+
+mosaicplot(~nhdsdatadf$Sex + nhdsdatadf$SourceofAdmission, ylab = 'Source of Admission', las = 2, cex.axis = 0.8, main = "Source of Admission Vs Sex")
+
+boxplot(nhdsdatadf$Age~nhdsdatadf$SourceofAdmission, las =2, ylab = 'Age')
+
+mosaicplot(nhdsdatadf$Sex~nhdsdatadf$ModeofPayment, las =2, ylab = 'Mode of Payment')
+
+ggplot(nhdsdatadf, aes(x=ModeofPayment, y=Age)) + geom_boxplot() + theme(axis.text.x  = element_text(angle=60, vjust=0.5))
+
+mosaicplot(nhdsdatadf$Sex~nhdsdatadf$X.GeoLocation, las =2, ylab = 'Geo Location', xlab = 'Sex')
+
+with(nhdsdatadf, table(nhdsdatadf$Sex, nhdsdatadf$X.GeoLocation))
+
+ggplot(nhdsdatadf, aes(x=X.GeoLocation, fill = Sex)) + geom_bar()
+
+ggplot(nhdsdatadf, aes(x=X.GeoLocation, fill = ModeofPayment), xlab("Geographic Location")) + geom_bar() + scale_y_log10() 
+
+ggplot(nhdsdatadf, aes(x = Age)) + geom_histogram(binwidth = 2) + facet_grid(Sex ~.)+ scale_x_continuous(lim=c(0,99),breaks=seq(0,99,2))
+
+```
+
+
+
+
+# Bivariate Analysis
+
+
+
+
+### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+
+### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+
+### What was the strongest relationship you found?
+
+
+
+
+# Multivariate Plots Section
+
+```{r echo=FALSE, Multivariate_Plots}
+
+```
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
+
+### Were there any interesting or surprising interactions between features?
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the strengths and limitations of your model.
+
+------
+
+# Final Plots and Summary
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+
+```
+
+### Description One
+
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+
+```
+
+### Description Two
+
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+
+```
+
+### Description Three
+
+------
+
+# Reflection
